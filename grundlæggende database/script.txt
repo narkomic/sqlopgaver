@@ -1,0 +1,409 @@
+-- =============================================
+-- Author: Nicolai Bondtofte
+-- Create date: 01/03/2022
+-- Uddannelse: IT-Supporter
+-- Description: Databaseer til papkasse shoppen.
+-- Opgavens spørgsmål er i teksten indledt med 3 bindestreger ---
+-- mine kommentarer er indledt med 2 bindestreger --
+-- =============================================
+
+--- Lav en database
+-- Oprettelse af database.
+ USE master
+ GO
+ CREATE DATABASE papkassen;
+
+-- brug database
+ USE papkassen;
+
+--- tabeller
+--- Det kunne for eksempel realiseres med flg. tabeller:
+--- Kundeoplysninger (kundenummer, navn, adresse osv.)
+--- Fakturaoplysninger (fakturanummer, kundenummer, købt vare, dato for køb mm.)
+--- Vareoplysninger (varenumre, varenavne, priser mm.) 
+
+-- Opret tabel til postnumre
+ USE papkassen;
+ CREATE TABLE postnumre (
+    postnummer varchar(4) PRIMARY KEY,
+    city varchar(255)
+	);
+
+-- Importer postnumre og bynavne fra CSV-fil
+-- CODEPAGE for at få æøå og andre specialtegn
+ USE papkassen;
+ bulk insert postnumre
+ from 'C:\sql\postnumre.csv'
+ WITH (
+        CODEPAGE = 'ACP',
+        FIELDTERMINATOR =';',
+        ROWTERMINATOR ='\n',
+        FirstRow=1
+     );
+
+-- Oprettelse af Kundeoplysninger Table.
+ USE papkassen;
+ CREATE TABLE Kundeoplysninger (
+	kundenummer int NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	navn varchar(255) NOT NULL,
+	adresse varchar(255) NOT NULL,
+    postnummer varchar(4) NOT NULL
+	);
+
+-- Oprettelse af Fakturaoplysninger Table.
+ USE papkassen;
+ CREATE TABLE Fakturaoplysninger (
+	kundenummer int NOT NULL,
+	fakturanummer varchar(255) NOT NULL,
+	købt_vare numeric(18, 0) NOT NULL,
+	antal numeric(18, 0) NOT NULL,
+	dato date
+	);
+
+-- Oprettelse af Vareoplysninger Table.
+ USE papkassen;
+ CREATE TABLE Vareoplysninger (
+	varenumre int NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	varenavne varchar(255),
+	pris numeric(18, 2) NOT NULL
+	);
+
+--- Der skal genereres en smule data i tabellerne 
+-- Data til tabel Kundeoplysninger
+ USE papkassen;
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer) 
+	VALUES ('MyAdvisor','Jagtvej 92',5000);
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Loguest','Holmens Kanal 2-12',1092);
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Costrategist','Sukkervænget 101, 2. tv',5000); 
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Vegetably','Vintersbølle Strand 5',4760)
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Paymob','Bagerstræde 1',4912)
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Luxuritz','Slangerupgårdsvej 1',3550)
+ INSERT INTO Kundeoplysninger (navn,adresse,postnummer)
+	VALUES ('Hyperbeauty','M P Jensens Vej 4',3550)
+
+--data til tabel Vareoplysninger
+ USE papkassen;
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Lille størrelse vandrette enkeltvægspapkasser',8);
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Enkeltvæg papkasser til lange produkter med topåbning',11);
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Flaske papkasser med skilleapparater',28); 
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Enlige væg firkantede papkasser',12)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Medium størrelse vandrette enkeltvæg papkasser',14)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Medium størrelse vandrette dobbeltvæg papkasser',66)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Lille størrelse vandrette dobbelte papkasser',28)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('BDCM-papkasser',25)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Lodrette kartonbokse med enkelt væg',24)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Dobbelt væg firkantede papkasser',28)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Dobbeltvæg papkasser til lange produkter med topåbning',30)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Enkeltvæg papkasser til lange produkter med sideåbning',36)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Dobbeltvæg papkasser til lange produkter med sideåbning',75)
+ INSERT INTO Vareoplysninger (varenavne,pris) 
+	VALUES ('Trippelvæg papkasser',120)
+	
+--data til tabel Fakturaoplysninger
+ USE papkassen;
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (6,1,4,50,'2020-03-21');
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (2,2,2,25,'2020-04-27');
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (7,3,8,100,'2020-08-15'); 
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (1,4,9,75,'2020-12-24')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (4,5,4,75,'2021-01-21')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (3,6,13,25,'2021-01-21')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (5,7,1,200,'2021-02-02')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (4,8,14,150,'2021-03-22')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (7,9,14,100,'2021-04-08')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (2,10,11,25,'2021-04-12')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (2,11,12,50,'2021-05-01')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (7,12,3,75,'2021-05-16')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (5,13,5,100,'2021-05-23')
+ INSERT INTO Fakturaoplysninger (kundenummer,fakturanummer,købt_vare,antal,dato) 
+	VALUES (6,14,8,200,'2021-06-04')
+
+--- Det er ønskeligt at kunne foretage mindst følgende udtræk:
+--- Oversigt over varer og priser
+--- Oversigt over kunder
+--- Oversigt over hvad de forskellige kunder har købt og hvad de skylder for det.
+
+-- Oversigt over varer og priser
+ use papkassen;
+ SELECT varenavne, pris FROM Vareoplysninger;
+
+-- Oversigt over kunder
+ use papkassen;
+ SELECT navn, adresse, postnumre.postnummer, postnumre.city
+ FROM Kundeoplysninger
+ INNER JOIN postnumre
+ ON Kundeoplysninger.postnummer = postnumre.postnummer
+
+-- Oversigt over hvad de forskellige kunder har købt og hvad de skylder for det
+ use papkassen;
+ SELECT fakturanummer,Kundeoplysninger.navn,Vareoplysninger.varenavne,Vareoplysninger.pris,antal,(antal * Vareoplysninger.pris) as Total
+ FROM Fakturaoplysninger
+ INNER JOIN Vareoplysninger
+ ON Fakturaoplysninger.købt_vare = Vareoplysninger.varenumre
+ INNER JOIN Kundeoplysninger
+ ON Fakturaoplysninger.kundenummer = Kundeoplysninger.kundenummer
+
+---Lav gerne flere
+-- søg kunder
+ use papkassen;
+ SELECT * FROM Kundeoplysninger
+ WHERE navn LIKE '%my%';
+
+-- se kunder efter postnumer
+ use papkassen;
+ SELECT * FROM Kundeoplysninger
+ ORDER BY postnummer ASC
+
+ use papkassen;
+ SELECT * FROM Kundeoplysninger
+ ORDER BY postnummer DESC
+
+--sammentælling af samlet udestående i orden efter skyldte beløb
+ use papkassen;
+ SELECT fakturanummer,Kundeoplysninger.navn,(antal * Vareoplysninger.pris) as Total
+ FROM Fakturaoplysninger
+ INNER JOIN Vareoplysninger
+ ON Fakturaoplysninger.købt_vare = Vareoplysninger.varenumre
+ INNER JOIN Kundeoplysninger
+ ON Fakturaoplysninger.kundenummer = Kundeoplysninger.kundenummer
+ ORDER BY Total ASC
+
+--- Der skal være Views 
+-- Lav view 1
+ use papkassen;
+ GO
+ CREATE VIEW infokunder AS
+ SELECT navn, adresse, postnumre.postnummer, postnumre.city
+ FROM Kundeoplysninger
+ INNER JOIN postnumre
+ ON Kundeoplysninger.postnummer = postnumre.postnummer
+
+-- vis view
+ use papkassen;
+ SELECT * FROM infokunder
+
+ -- slet view
+ use papkassen;
+ DROP VIEW infokunder
+ 
+-- lav view 2
+ use papkassen;
+ GO
+ CREATE VIEW kunderskylder AS
+ SELECT fakturanummer,Kundeoplysninger.navn,(antal * Vareoplysninger.pris) as Total
+ FROM Fakturaoplysninger
+ INNER JOIN Vareoplysninger
+ ON Fakturaoplysninger.købt_vare = Vareoplysninger.varenumre
+ INNER JOIN Kundeoplysninger
+ ON Fakturaoplysninger.kundenummer = Kundeoplysninger.kundenummer
+
+-- vis view 2
+ use papkassen;
+ SELECT * FROM kunderskylder
+
+-- slet view 2
+ use papkassen;
+ DROP VIEW kunderskylder
+
+-- lav view 3
+ use papkassen;
+ GO
+ CREATE VIEW vare AS
+ SELECT * FROM Vareoplysninger
+
+-- vis view 3
+ use papkassen;
+ SELECT * FROM vare
+
+-- slet view 3
+ use papkassen;
+ DROP VIEW vare
+
+--- Gerne brug af Stored-procedure i så stor udstrækning som muligt. 
+-- Lav Procedure til input af data til tabeller
+-- I execute procedure er der en linie der hedder @StatementType der skal der skrives insert, select,update eller delete
+-- Procedure til input af data til Kundeoplysninger
+ CREATE PROCEDURE kundeinsertupdatedelete (@kundenummer		int = NULL,
+										  @navn     VARCHAR(255) = NULL,
+                                          @adresse        VARCHAR(255) = NULL,
+                                          @postnummer          VARCHAR(4) = NULL,
+                                          @StatementType NVARCHAR(20) = '')
+ AS
+  BEGIN
+      IF @StatementType = 'Insert'
+        BEGIN
+            INSERT INTO Kundeoplysninger
+                        (navn,
+                         adresse,
+                         postnummer)
+            VALUES     ( @navn,
+                         @adresse,
+                         @postnummer)
+        END
+
+      IF @StatementType = 'Select'
+        BEGIN
+            SELECT *
+            FROM   Kundeoplysninger
+        END
+
+      IF @StatementType = 'Update'
+        BEGIN
+            UPDATE Kundeoplysninger
+            SET    navn = IsNULL(@navn, navn),
+                   adresse = IsNULL(@adresse, adresse),
+                   postnummer = IsNULL(@postnummer, postnummer)
+            WHERE  kundenummer = @kundenummer
+        END
+      ELSE IF @StatementType = 'Delete'
+        BEGIN
+            DELETE FROM Kundeoplysninger
+            WHERE  kundenummer = @kundenummer
+        END
+  END
+
+  EXEC kundeinsertupdatedelete @navn = 'joeren', @adresse = 'test', @postnummer = '5654', @StatementType = 'Insert';
+
+-- Procedure til input af data til Vareoplysninger
+ CREATE PROCEDURE vareinsertupdatedelete (@varenumre		int = NULL,
+										  @varenavne     VARCHAR(255) = NULL,
+                                          @pris        numeric(18, 2) = NULL,
+                                          @StatementType NVARCHAR(20) = '')
+ AS
+  BEGIN
+      IF @StatementType = 'Insert'
+        BEGIN
+            INSERT INTO Vareoplysninger
+                        (varenavne,
+                         pris)
+            VALUES     ( @varenavne,
+                         @pris)
+        END
+
+      IF @StatementType = 'Select'
+        BEGIN
+            SELECT *
+            FROM   Vareoplysninger
+        END
+
+      IF @StatementType = 'Update'
+        BEGIN
+            UPDATE Vareoplysninger
+            SET    varenavne = IsNULL(@varenavne, varenavne),
+                   pris = IsNULL(@pris, pris)
+            WHERE  varenumre = @varenumre
+        END
+      ELSE IF @StatementType = 'Delete'
+        BEGIN
+            DELETE FROM Vareoplysninger
+            WHERE  varenumre = @varenumre
+        END
+  END
+
+-- Procedure til input af data til Fakturaoplysninger
+ CREATE PROCEDURE fakturainsertupdatedelete (@kundenummer		int = NULL,
+										  @fakturanummer     VARCHAR(255) = NULL,
+                                          @købt_vare        numeric(18, 2) = NULL,
+										  @antal        numeric(18, 2) = NULL,
+                                          @StatementType NVARCHAR(20) = '')
+ AS
+  BEGIN
+      IF @StatementType = 'Insert'
+        BEGIN
+            INSERT INTO Fakturaoplysninger
+                        (kundenummer,
+						 købt_vare,
+                         antal)
+            VALUES      (@kundenummer, 
+						 @købt_vare,
+                         @antal)
+        END
+
+      IF @StatementType = 'Select'
+        BEGIN
+            SELECT *
+            FROM   Fakturaoplysninger
+        END
+
+      IF @StatementType = 'Update'
+        BEGIN
+            UPDATE Fakturaoplysninger
+            SET    kundenummer = IsNULL(@kundenummer, kundenummer),
+				   købt_vare = IsNULL(@købt_vare, købt_vare),
+                   antal = IsNULL(@antal, antal)
+            WHERE  fakturanummer = @fakturanummer
+        END
+      ELSE IF @StatementType = 'Delete'
+        BEGIN
+            DELETE FROM Fakturaoplysninger
+            WHERE  fakturanummer = @fakturanummer
+        END
+  END
+
+-- Der skal være script til at nedlægge alle tabeller og hele databasen.
+-- Sletning af tabel.
+ use papkassen;
+ GO
+ DROP TABLE Kundeoplysninger;
+ DROP TABLE postnumre;
+ DROP TABLE Fakturaoplysninger;
+ DROP TABLE Vareoplysninger;
+
+-- Sletning af database.
+ use master;
+ go
+ DROP DATABASE papkassen;
+
+--- Af andre ønskede koder kan nævnes : Join, Constraint, Update. 
+
+-- Join bliver brugt tidligere
+
+-- Constraint eksempler
+-- PRIMARY KEY linie 28
+-- NOT NULL linie 48 
+
+-- Update
+ UPDATE Vareoplysninger
+ SET pris = 2500
+ WHERE varenumre = 8;
+
+-- Extra
+-- Backup af database.
+ use master;
+ BACKUP DATABASE papkassen
+ TO DISK = 'c:\sql\backup.bak' with init
+
+-- restore backup.
+ use master;
+ RESTORE DATABASE papkassen
+ FROM DISK = 'c:\sql\backup.bak'
